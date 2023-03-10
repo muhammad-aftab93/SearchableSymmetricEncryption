@@ -1,0 +1,14 @@
+li.active {
+    background-color: lightgrey;
+    color: #fff;
+}
+
+li.inactive {
+    background-color: transparent;
+    color: #333;
+}
+
+a#title {
+    text-decoration: none;
+    color: black;
+}

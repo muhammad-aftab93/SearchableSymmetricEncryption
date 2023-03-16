@@ -172,10 +172,6 @@ namespace SearchableSymmetricEncryption
 
         static void Main(string[] args)
         {
-            // generate random keys for encryption and HMAC
-            var encryptionKey = GenerateKey();
-            var hmacKey = GenerateKey();
-
             // create some sample documents with ids and contents
             var documents = new Dictionary<string, string>
             {

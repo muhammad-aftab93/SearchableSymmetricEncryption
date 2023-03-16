@@ -1,3 +1,4 @@
+using backend;
 using backend.Data;
 using backend.Encryption;
 using backend.Encryption.Interfaces;
@@ -8,6 +9,7 @@ using backend.Repository.Interfaces;
 using backend.SseOperations;
 using backend.SseOperations.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,9 +22,11 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddTransient<IFileValidator, FileValidator>();
 
-builder.Services.AddTransient<IRepository, Repository>();
-builder.Services.AddTransient<IEncryption, Encryption>();
 builder.Services.AddTransient<ISseOperations, SseOperations>();
+builder.Services.AddTransient<IEncryption, Encryption>();
+builder.Services.AddTransient<IRepository, Repository>();
+
+builder.Services.Configure<Keys>(builder.Configuration.GetSection("Keys"));
 
 builder.Services.AddDbContext<TDbContext>(options =>
 {

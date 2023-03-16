@@ -43,18 +43,15 @@ public class SseController : ControllerBase
 
         try
         {
-            var keyStr = _keys.Key;
-            var hkeyStr = _keys.Hmac;
-
             // File Validation
             _fileValidator.Validate(formFile);
 
-            string fileName = formFile.FileName;
+            var fileName = Path.GetFileNameWithoutExtension(formFile.FileName);
             using var reader = new StreamReader(formFile.OpenReadStream());
             var fileContent = await reader.ReadToEndAsync();
 
             // Encryption
-            var (encryptedContent, encrypedFileName) = _sseOperations.SSEncrypt(
+            var (encryptedContent, encrypedFileName) = _sseOperations.SsEncrypt(
                 fileName,
                 fileContent,
                 Convert.FromBase64String(_keys.Key),
@@ -92,15 +89,38 @@ public class SseController : ControllerBase
 
         try
         {
+            fileName = Path.GetFileNameWithoutExtension(fileName);
+            var (fileName1, fileContent) = await _sseOperations.SsSearch(
+                        fileName,
+                        Convert.FromBase64String(_keys.Key),
+                        Convert.FromBase64String(_keys.Hmac)
+                    );
 
-            response.Success = true;
-            response.Message = "";
-            response.ReturnedObject = new SearchFileResponse()
+            if (string.IsNullOrEmpty(fileName1))
             {
-                FileName = "",
-                Url = ""
-            };
+                response.Success = false;
+                response.Message = "File not found!";
+            }
+            else
+            {
+                // Decrypt found file
+                var decryptedContent = _sseOperations.SsDecrypt(
+                    Convert.FromBase64String(fileContent ?? ""),
+                    Convert.FromBase64String(_keys.Key));
 
+                // TODO - Write a file and return download link of that file
+
+                response.Success = true;
+                response.Message = "File found.";
+                response.ReturnedObject = new SearchFileResponse()
+                {
+                    FileName = $"{fileName}.txt",
+                    FileContent = decryptedContent,
+                    Url = ""
+                };
+            }
+
+            response.Success = false;
         }
         catch (Exception e)
         {

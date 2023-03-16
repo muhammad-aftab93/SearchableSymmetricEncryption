@@ -2,6 +2,7 @@
 
 public class SearchFileResponse
 {
-    public string FileName { get; set; } = null!;
-    public string Url { get; set; } = null!;
+    public string? FileName { get; set; } = null!;
+    public string? FileContent { get; set; } = null!;
+    public string? Url { get; set; } = null!;
 }

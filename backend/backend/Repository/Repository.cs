@@ -14,6 +14,9 @@ public class Repository : IRepository
 
     public async Task<int> SaveEncryptedFileAsync(EncryptedFiles file)
     {
+        if (_context.EncryptedFiles.Any(x => x.FileName == file.FileName))
+            throw new Exception("Filename already exists.");
+
         await _context.EncryptedFiles.AddAsync(file);
         return await _context.SaveChangesAsync();
     }

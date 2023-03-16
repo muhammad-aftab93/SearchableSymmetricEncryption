@@ -1,20 +1,24 @@
 ﻿using backend.SseOperations.Interfaces;
 using System.Text;
 using backend.Encryption.Interfaces;
+using backend.Repository.Interfaces;
 
 namespace backend.SseOperations;
 
 public class SseOperations : ISseOperations
 {
     private readonly IEncryption _encryption;
+    private readonly IRepository _repository;
 
-    public SseOperations(IEncryption encryption)
+    public SseOperations(IEncryption encryption,
+        IRepository repository)
     {
         _encryption = encryption;
+        _repository = repository;
     }
 
     // function to encrypt and index a document using searchable symmetric encryption
-    public Tuple<byte[], byte[]> SSEncrypt(string documentId, string documentContent, byte[] encryptionKey, byte[] hmacKey)
+    public Tuple<byte[], byte[]> SsEncrypt(string documentId, string documentContent, byte[] encryptionKey, byte[] hmacKey)
     {
         // convert the document id and content to bytes
         var docIdBytes = Encoding.UTF8.GetBytes(documentId);
@@ -31,7 +35,7 @@ public class SseOperations : ISseOperations
     }
 
     // function to decrypt and retrieve a document using searchable symmetric encryption
-    public string SSDecrypt(byte[] encryptedDocumentContent, byte[] encryptionKey)
+    public string SsDecrypt(byte[] encryptedDocumentContent, byte[] encryptionKey)
     {
 
         // decrypt the encrypted document content with the encryption key 
@@ -45,30 +49,15 @@ public class SseOperations : ISseOperations
     }
 
     // function to search for documents that contain a keyword 
-    public void SSSearch(string keyword, Dictionary<byte[], byte[]> documents, byte[] encryptionKey, byte[] hmacKey)
+    public async Task<(string? fileName, string? fileContent)> SsSearch(string keyword, byte[] encryptionKey, byte[] hmacKey)
     {
         // convert the keyword to bytes 
         var keywordBytes = Encoding.UTF8.GetBytes(keyword);
 
         // compute the HMAC of the keyword with the hmac key 
-        var hmacKeyword = _encryption.ComputeHMAC(keywordBytes, hmacKey);
+        var hmacKeyword = Convert.ToBase64String(_encryption.ComputeHMAC(keywordBytes, hmacKey));
 
-        // loop over the documents dictionary
-        foreach (var entry in documents)
-        {
-            // get the encrypted document content and the HMAC from the entry
-            var encryptedDocContent = entry.Key;
-            var hmacDocId = entry.Value;
-
-            // check if the HMAC of the document id matches the HMAC of the keyword
-            if (hmacDocId.SequenceEqual(hmacKeyword))
-            {
-                // decrypt and retrieve the document content with the encryption key
-                var docContentString = SSDecrypt(encryptedDocContent, encryptionKey);
-
-                // print the document content
-                Console.WriteLine(docContentString);
-            }
-        }
+        var ecnryptedFile = await _repository.GetEncryptedFilesAsync(hmacKeyword);
+        return (ecnryptedFile?.FileName, ecnryptedFile?.Content);
     }
 }

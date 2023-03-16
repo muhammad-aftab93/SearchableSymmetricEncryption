@@ -2,16 +2,15 @@
 
 public interface ISseOperations
 {
-    Tuple<byte[], byte[]> SSEncrypt(string documentId,
+    Tuple<byte[], byte[]> SsEncrypt(string documentId,
         string documentContent,
         byte[] encryptionKey,
         byte[] hmacKey);
 
-    string SSDecrypt(byte[] encryptedDocumentContent,
+    string SsDecrypt(byte[] encryptedDocumentContent,
         byte[] encryptionKey);
 
-    void SSSearch(string keyword,
-        Dictionary<byte[], byte[]> documents,
+    Task<(string? fileName, string? fileContent)> SsSearch(string keyword,
         byte[] encryptionKey,
         byte[] hmacKey);
 }

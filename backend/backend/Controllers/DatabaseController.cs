@@ -13,7 +13,7 @@ public class DatabaseController : ControllerBase
     public DatabaseController(IRepository repository)
         => _repository = repository;
 
-    [HttpPost(Name = "UploadFile")]
+    [HttpPost(Name = "Reset")]
     public async Task<bool> Reset()
     {
         try

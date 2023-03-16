@@ -1,6 +1,8 @@
 using backend.Data;
 using backend.Encryption;
 using backend.Encryption.Interfaces;
+using backend.HelperFunctions;
+using backend.HelperFunctions.Interfaces;
 using backend.Repository;
 using backend.Repository.Interfaces;
 using backend.SseOperations;
@@ -15,6 +17,8 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddTransient<IFileValidator, FileValidator>();
 
 builder.Services.AddTransient<IRepository, Repository>();
 builder.Services.AddTransient<IEncryption, Encryption>();

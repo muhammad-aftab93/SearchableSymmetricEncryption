@@ -1,4 +1,5 @@
 ﻿using backend.Entities;
+using backend.HelperFunctions.Interfaces;
 using backend.Models;
 using backend.Repository.Interfaces;
 using backend.Responses;
@@ -11,9 +12,14 @@ namespace backend.Controllers;
 public class SseController : ControllerBase
 {
     private readonly IRepository _repository;
+    private readonly IFileValidator _fileValidator;
 
-    public SseController(IRepository repository)
-        => _repository = repository;
+    public SseController(IRepository repository,
+        IFileValidator fileValidator)
+    {
+        _repository = repository;
+        _fileValidator = fileValidator;
+    }
 
     [HttpPost(Name = "UploadFile")]
     public async Task<Response<object>> UploadFile(IFormFile formFile)
@@ -26,10 +32,8 @@ public class SseController : ControllerBase
 
         try
         {
-            // File validations + Mime Type ??
-            // file type
-            // file size
-            // 
+            // File Validation
+            _fileValidator.Validate(formFile);
 
             // Encryption
 

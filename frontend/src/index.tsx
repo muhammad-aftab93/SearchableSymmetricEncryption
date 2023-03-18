@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import store from './store/store';
 
 //theme
 import "primereact/resources/themes/lara-light-indigo/theme.css";
@@ -12,6 +13,7 @@ import "primereact/resources/primereact.min.css";
 
 //icons
 import "primeicons/primeicons.css";
+import {Provider} from "react-redux";
 
 
 const root = ReactDOM.createRoot(
@@ -19,7 +21,9 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <React.StrictMode>
-    <App />
+      <Provider store={store}>
+            <App />
+      </Provider>
   </React.StrictMode>
 );
 

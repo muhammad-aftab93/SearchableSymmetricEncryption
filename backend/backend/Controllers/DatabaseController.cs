@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace backend.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("[controller]/[action]")]
 public class DatabaseController : ControllerBase
 {
     private readonly IRepository _repository;

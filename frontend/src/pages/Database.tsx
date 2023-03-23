@@ -3,9 +3,11 @@ import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import {Button} from "primereact/button";
 import {ProgressSpinner} from "primereact/progressspinner";
 import {resetDatabase} from "../store/features/databaseSlice";
+import { Messages } from 'primereact/messages';
 
 const Database = () => {
     const [loading, setLoading] = useState(false);
+    const msgs = useRef<Messages>(null);
 
     const accept = () => {
         setLoading(true);
@@ -13,14 +15,32 @@ const Database = () => {
             .then(res => {
                 setLoading(false);
                 if(res.data) {
-                    alert('Database has been reset successfully.')
+                    msgs.current?.show({
+                        severity: 'success', sticky: false, content: (
+                            <React.Fragment>
+                                <div className="ml-2">Database has been reset successfully.</div>
+                            </React.Fragment>
+                        )
+                    });
                 } else {
-                    alert('Database has been reset successfully.')
+                    msgs.current?.show({
+                        severity: 'success', sticky: false, content: (
+                            <React.Fragment>
+                                <div className="ml-2">Database has been reset successfully.</div>
+                            </React.Fragment>
+                        )
+                    });
                 }
             })
             .catch(err => {
                 setLoading(false);
-                alert('Something went wrong.');
+                msgs.current?.show({
+                    severity: 'success', sticky: false, content: (
+                        <React.Fragment>
+                            <div className="ml-2">Something went wrong.</div>
+                        </React.Fragment>
+                    )
+                });
             });
     }
 
@@ -58,6 +78,8 @@ const Database = () => {
                     </div>
                 </div>
             }
+
+            <Messages ref={msgs} />
         </>
     )
 }

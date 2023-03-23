@@ -12,7 +12,7 @@ using backend.SseOperations.Interfaces;
 namespace backend.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("[controller]/[action]")]
 public class SseController : ControllerBase
 {
     private readonly IRepository _repository;

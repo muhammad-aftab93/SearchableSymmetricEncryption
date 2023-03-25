@@ -108,7 +108,14 @@ public class SseController : ControllerBase
                     Convert.FromBase64String(fileContent ?? ""),
                     Convert.FromBase64String(_keys.Key));
 
-                // TODO - Write a file and return download link of that file
+                var directory = "TempFiles";
+                var filename = $"{fileName}.txt";
+
+                if(!Directory.Exists(directory))
+                    Directory.CreateDirectory(directory);
+
+                await using var streamWriter = new StreamWriter($"/{directory}/{filename}", false);
+                await streamWriter.WriteAsync(fileContent);
 
                 response.Success = true;
                 response.Message = "File found.";

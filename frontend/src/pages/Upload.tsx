@@ -1,11 +1,6 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { Toast } from 'primereact/toast';
-import { FileUpload } from 'primereact/fileupload';
-import { ProgressBar } from 'primereact/progressbar';
+import React, { useRef, useState} from 'react';
 import { Button } from 'primereact/button';
-import { Tooltip } from 'primereact/tooltip';
-import { Tag } from 'primereact/tag';
-import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
+import { ConfirmDialog} from 'primereact/confirmdialog';
 import { ProgressSpinner } from "primereact/progressspinner";
 import { Messages } from 'primereact/messages';
 import {SseUploadFileEndpoint} from "../constants/endpoints";
@@ -80,6 +75,7 @@ const Upload = () => {
 
             {!loading &&
                 <div className="row" style={{ marginTop: '1rem' }}>
+                    <h3 className="text-center">Upload file</h3>
                     <div className="col-3">
                         <ConfirmDialog />
                         <div className="flex flex-wrap gap-2 justify-content-center">

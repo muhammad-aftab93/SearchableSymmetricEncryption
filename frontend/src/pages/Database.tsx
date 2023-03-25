@@ -70,6 +70,7 @@ const Database = () => {
 
             {!loading &&
                 <div className="row" style={{ marginTop: '1rem' }}>
+                    <h3 className="text-center">Database</h3>
                     <div className="col-3">
                         <ConfirmDialog />
                         <div className="card flex flex-wrap gap-2 justify-content-center">

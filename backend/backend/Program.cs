@@ -10,6 +10,7 @@ using backend.SseOperations;
 using backend.SseOperations.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,6 +46,17 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 app.UseAuthorization();
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(Directory.GetCurrentDirectory(), "TempFiles")),
+    RequestPath = "/TempFiles",
+    OnPrepareResponse = ctx =>
+    {
+        ctx.Context.Response.Headers.Append("Access-Control-Allow-Origin", "*");
+    }
+});
 
 app.MapControllers();
 

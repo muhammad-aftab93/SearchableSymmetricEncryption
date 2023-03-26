@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System;
 using backend.SseOperations.Interfaces;
+using Microsoft.AspNetCore.StaticFiles;
 
 namespace backend.Controllers;
 
@@ -82,8 +83,8 @@ public class SseController : ControllerBase
         return response;
     }
 
-    [HttpGet(Name = "SearchFile")]
-    public async Task<Response<SearchFileResponse>> SearchFile(string fileName)
+    [HttpPost(Name = "SearchFile")]
+    public async Task<Response<SearchFileResponse>> SearchFile([FromForm] string fileName)
     {
         var response = new Response<SearchFileResponse>();
 
@@ -114,8 +115,8 @@ public class SseController : ControllerBase
                 if(!Directory.Exists(directory))
                     Directory.CreateDirectory(directory);
 
-                await using var streamWriter = new StreamWriter($"/{directory}/{filename}", false);
-                await streamWriter.WriteAsync(fileContent);
+                await using var streamWriter = new StreamWriter($"{directory}/{filename}", false);
+                await streamWriter.WriteAsync(decryptedContent);
 
                 response.Success = true;
                 response.Message = "File found.";
@@ -126,8 +127,6 @@ public class SseController : ControllerBase
                     Url = ""
                 };
             }
-
-            response.Success = false;
         }
         catch (Exception e)
         {
@@ -136,5 +135,21 @@ public class SseController : ControllerBase
         }
 
         return response;
+    }
+
+    [HttpGet]
+    [Route("{fileName}")]
+    public async Task<IActionResult> DownloadFile(string fileName)
+    {
+        var path = Path.Combine(
+            Directory.GetCurrentDirectory(),
+            "TempFiles", fileName);
+
+        var memory = new MemoryStream();
+        await using var stream = new FileStream(path, FileMode.Open);
+        await stream.CopyToAsync(memory);
+        memory.Position = 0;
+
+        return File(memory, "application/octet-stream", Path.GetFileName(path));
     }
 }

@@ -1,9 +1,10 @@
-import React, { useRef, useState} from 'react';
+import React, { useRef, useState } from 'react';
 import { Button } from 'primereact/button';
-import { ConfirmDialog} from 'primereact/confirmdialog';
+import { ConfirmDialog } from 'primereact/confirmdialog';
 import { ProgressSpinner } from "primereact/progressspinner";
 import { Messages } from 'primereact/messages';
-import {SseUploadFileEndpoint} from "../constants/endpoints";
+import { SseUploadFileEndpoint } from "../constants/endpoints";
+import { Card } from 'primereact/card';
 
 const Upload = () => {
     const [loading, setLoading] = useState(false);
@@ -17,8 +18,9 @@ const Upload = () => {
     };
 
     const onUploadFile = () => {
-        if(!selectedFile)
-        {
+        if (!selectedFile) return;
+
+        if (!selectedFile) {
             msgs.current?.show({
                 severity: 'error', sticky: false, content: (
                     <React.Fragment>
@@ -37,72 +39,71 @@ const Upload = () => {
                 method: 'POST',
                 body: formData,
             })
-            .then((response) => { return response.json(); })
-            .then((result) => {
-                setLoading(false);
+                .then((response) => { return response.json(); })
+                .then((result) => {
+                    setLoading(false);
 
-                msgs.current?.show({
-                    severity: 'success', sticky: false, content: (
-                        <React.Fragment>
-                            <div className="ml-2">File uploaded successfully.</div>
-                        </React.Fragment>
-                    )
+                    msgs.current?.show({
+                        severity: 'success', sticky: false, content: (
+                            <React.Fragment>
+                                <div className="ml-2">File uploaded successfully.</div>
+                            </React.Fragment>
+                        )
+                    });
+
+                })
+                .catch((error) => {
+                    setLoading(false);
+
+                    msgs.current?.show({
+                        severity: 'error', sticky: false, content: (
+                            <React.Fragment>
+                                <div className="ml-2">File upload failed.</div>
+                            </React.Fragment>
+                        )
+                    });
+
                 });
-
-            })
-            .catch((error) => {
-                setLoading(false);
-
-                msgs.current?.show({
-                    severity: 'error', sticky: false, content: (
-                        <React.Fragment>
-                            <div className="ml-2">File upload failed.</div>
-                        </React.Fragment>
-                    )
-                });
-
-            });
         }
     };
 
     return (
         <>
-            {loading &&
-                <div className="card flex justify-content-center">
-                    <ProgressSpinner />
-                </div>
-            }
+            <Card style={{ backgroundColor: '#F8F9FA', height: '40rem', marginTop: '1rem' }} className="text-center">
+                {loading &&
+                    <div className="card flex justify-content-center">
+                        <ProgressSpinner />
+                    </div>
+                }
 
-            {!loading &&
-                <div className="row" style={{ marginTop: '1rem' }}>
-                    <h3 className="text-center">Upload file</h3>
-                    <div className="col-3">
-                        <ConfirmDialog />
-                        <div className="flex flex-wrap gap-2 justify-content-center">
+                {!loading &&
+                    <div className="row">
+                        <h3 className="text-center">Upload file</h3>
+                        <div className="col-12 mt-5">
+                            <ConfirmDialog />
                             <div>
-                                Select File: 
                                 <input
                                     type="file"
                                     onChange={handleFileChange}
                                     accept=".txt" />
-                            </div>
-                            <br />
-                            <div>
+
                                 <Button
                                     onClick={onUploadFile}
                                     icon="pi pi-upload"
                                     className={"p-button-primary"}
-                                    label="Upload File">
+                                    label="Upload File"
+                                    size='small'>
                                 </Button>
                             </div>
+                                
                         </div>
                     </div>
-                </div>
-            }
+                }
 
-            <br />
+                <br />
 
-            <Messages ref={msgs} />
+                <Messages ref={msgs} />
+            </Card>
         </>
     )
 }

@@ -23,6 +23,8 @@ const Search = () => {
     });
 
     const onSearchHandler = () => {
+        if (!value) return; 
+
         setLoading(true);
         const formData = new FormData();
         formData.append('fileName', value);
@@ -30,33 +32,33 @@ const Search = () => {
             method: 'POST',
             body: formData,
         })
-        .then((response) => { return response.json(); })
-        .then((result) => {
-            setLoading(false);
-            setResponse(result);
+            .then((response) => { return response.json(); })
+            .then((result) => {
+                setLoading(false);
+                setResponse(result);
 
-            if(!result.success) {
+                if (!result.success) {
+                    msgs.current?.show({
+                        severity: 'error', sticky: false, content: (
+                            <React.Fragment>
+                                <div className="ml-2">{result.message}</div>
+                            </React.Fragment>
+                        )
+                    });
+                }
+            })
+            .catch((error) => {
+                setLoading(false);
+
                 msgs.current?.show({
                     severity: 'error', sticky: false, content: (
                         <React.Fragment>
-                            <div className="ml-2">{result.message}</div>
+                            <div className="ml-2">{error.message}</div>
                         </React.Fragment>
                     )
                 });
-            }
-        })
-        .catch((error) => {
-            setLoading(false);
 
-            msgs.current?.show({
-                severity: 'error', sticky: false, content: (
-                    <React.Fragment>
-                        <div className="ml-2">{error.message}</div>
-                    </React.Fragment>
-                )
             });
-
-        });
     }
 
     const onDownloadFile = (filename: string | null) => {
@@ -65,38 +67,38 @@ const Search = () => {
         setLoading(true);
 
         fetch(SseDownloadFileEndpoint + '/' + filename)
-        .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-            return response.blob();
-        })
-        .then(blob => {
-            setLoading(false);
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                setLoading(false);
 
-            fileDownload(blob, filename)
+                fileDownload(blob, filename)
 
-            msgs.current?.show({
-                severity: 'success', sticky: false, content: (
-                    <React.Fragment>
-                        <div className="ml-2">File downloaded successfully. {filename}</div>
-                    </React.Fragment>
-                )
+                msgs.current?.show({
+                    severity: 'success', sticky: false, content: (
+                        <React.Fragment>
+                            <div className="ml-2">File downloaded successfully. {filename}</div>
+                        </React.Fragment>
+                    )
+                });
+
+            })
+            .catch(error => {
+                setLoading(false);
+
+                msgs.current?.show({
+                    severity: 'error', sticky: false, content: (
+                        <React.Fragment>
+                            <div className="ml-2">{error.message}</div>
+                        </React.Fragment>
+                    )
+                });
+
             });
-
-        })
-        .catch(error => {
-            setLoading(false);
-
-            msgs.current?.show({
-                severity: 'error', sticky: false, content: (
-                    <React.Fragment>
-                        <div className="ml-2">{error.message}</div>
-                    </React.Fragment>
-                )
-            });
-
-        });
 
     }
 
@@ -104,55 +106,60 @@ const Search = () => {
 
     return (
         <>
-            {loading &&
-                <div className="card flex justify-content-center">
-                    <ProgressSpinner />
-                </div>
-            }
-
-            {!loading &&
-                <div className="row" style={{ marginTop: '1rem' }}>
+            <Card style={{ backgroundColor: '#F8F9FA', height: '40rem', marginTop: '1rem' }} className="text-center">
+                {loading &&
                     <div className="flex justify-content-center">
-                        <h3 className="text-center">Search file</h3>
-                        
-                        Search by filename:&nbsp;
-
-                        <InputText value={value} onChange={(e) => setValue(e.target.value)} />
-
-                        &nbsp;
-                        <Button
-                            type="button"
-                            onClick={onSearchHandler}
-                            label="Search"
-                            className="mt-2"
-                            />
-
+                        <ProgressSpinner />
                     </div>
-                </div>
-            }
-            
-            {response.success &&
-                <div className="col-5">
-                    <Card
-                        title={getTitle(response.returnedObject.fileName)}
-                        className='m-5 text-center'
-                        style={{ background: '#f2f2f2' }}
-                        >
-                        <img width='150px' src="/file-icon.png" alt="" />
-                        <h5>{response.returnedObject.fileName}</h5>
+                }
 
-                        <Button
-                            type="button"
-                            onClick={() => onDownloadFile(response.returnedObject.fileName)}
-                            label="Download"
-                            className="mt-2"
+                {!loading &&
+                    <div className="row">
+                        <div className="flex justify-content-center">
+                            <h3 className="text-center">Search file</h3>
+
+                            <br />
+
+                            <InputText value={value} placeholder='Filename' onChange={(e) => setValue(e.target.value)} />
+
+                            &nbsp;
+                            <Button
+                                type="button"
+                                onClick={onSearchHandler}
+                                label="Search"
+                                className="mt-2"
                             />
 
-                    </Card>
-                </div>
-            }
-            
-            <Messages ref={msgs} />
+                        </div>
+                    </div>
+                }
+
+                {response.success && !loading &&
+                    <div className="row">
+                        <div className="col-4"></div>
+                        <div className="col-4">
+                            <Card
+                                title={getTitle(response.returnedObject.fileName)}
+                                className='m-5 text-center'
+                                style={{ background: 'lightblue' }}
+                            >
+                                <img width='150px' src="/file-icon.png" alt="" />
+                                <h5>{response.returnedObject.fileName}</h5>
+
+                                <Button
+                                    type="button"
+                                    onClick={() => onDownloadFile(response.returnedObject.fileName)}
+                                    label="Download"
+                                    className="mt-2"
+                                />
+
+                            </Card>
+                        </div>
+                    </div>
+                }
+
+                <Messages ref={msgs} />
+            </Card>
         </>
     );
 }
